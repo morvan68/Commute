@@ -1,20 +1,14 @@
-#@+leo-ver=5-thin
-#@+node:martin.20180914202302.2: * @file ./commute.py
-#@+others
-#@+node:martin.20180914202302.3: ** Declarations
 import googlemaps
 import requests
 import sys
 
 
-#@+node:martin.20180914203343.1: ** defaults
 #Declarations
 token = '' # Enter your Google API Token
 start = sys.argv[1]
 end = sys.argv[2]
 bot_token = '' # Enter your Telegram bot token here
 chat_id = '' # Enter your Telegram chat id here
-#@+node:martin.20180914202542.1: ** commute
 def commute( start, end):
     # Get directions
     client = googlemaps.Client(key=token)
@@ -33,7 +27,6 @@ def commute( start, end):
         error = 'Error during processing'
         print( error)
     return result_list
-#@+node:martin.20180914202850.1: ** send telegram
 def send_tele( result_list, bot_token = bot_token, chat_id = chat_id):
     try:
         # Get request and send message via bot
@@ -46,7 +39,6 @@ def send_tele( result_list, bot_token = bot_token, chat_id = chat_id):
         error = 'Error during processing'
         requests.get('https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'.format(
                                         bot_token, chat_id, error))
-#@+node:martin.20180914202412.1: ** __main__
 
 
 if __name__ == '__main__':
@@ -55,7 +47,3 @@ if __name__ == '__main__':
     result_list = commute( start, end)
     send_tele( result_list, bot_token = bot_token, chat_id = chat_id)
 
-#@-others
-#@@language python
-#@@tabwidth -4
-#@-leo
