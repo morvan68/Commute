@@ -1,34 +1,61 @@
+#@+leo-ver=5-thin
+#@+node:martin.20180914202302.2: * @file ./commute.py
+#@+others
+#@+node:martin.20180914202302.3: ** Declarations
 import googlemaps
 import requests
 import sys
+
+
+#@+node:martin.20180914203343.1: ** defaults
 #Declarations
 token = '' # Enter your Google API Token
 start = sys.argv[1]
 end = sys.argv[2]
 bot_token = '' # Enter your Telegram bot token here
 chat_id = '' # Enter your Telegram chat id here
-# get Client object
-client = googlemaps.Client(key=token)
-# Get directions
-try:
-    directions = client.directions(start,end,alternatives=True)
+#@+node:martin.20180914202542.1: ** commute
+def commute( start, end):
+    # Get directions
+    client = googlemaps.Client(key=token)
+    try:
+        directions = client.directions(start,end,alternatives=True)
+    # Prepare data
+        table = dict()
+        for i in range(len(directions)):
+            table.setdefault(directions[i]["summary"])
+            table[directions[i]["summary"]] = directions[i]["legs"][0]["duration"]["text"]
 
-# Prepare data
-    table = dict()
-    for i in range(len(directions)):
-        table.setdefault(directions[i]["summary"])
-        table[directions[i]["summary"]] = directions[i]["legs"][0]["duration"]["text"]
+        result_list = []
+        for key,value in table.items():
+            result_list.append(' '.join([key,':',value, "\n"]))
+    except:
+        error = 'Error during processing'
+        print( error)
+    return result_list
+#@+node:martin.20180914202850.1: ** send telegram
+def send_tele( result_list, bot_token = bot_token, chat_id = chat_id):
+    try:
+        # Get request and send message via bot
+        message = ''.join(result_list)
 
-    result_list = []
-    for key,value in table.items():
-        result_list.append(' '.join([key,':',value, "\n"]))
+        requests.get('https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'.format(
+                                        bot_token, chat_id, message))
 
-# Get request and send message via bot
-    message = ''.join(result_list)
+    except:
+        error = 'Error during processing'
+        requests.get('https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'.format(
+                                        bot_token, chat_id, error))
+#@+node:martin.20180914202412.1: ** __main__
 
-    requests.get('https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'.format(bot_token, chat_id, message))
 
-except:
-    error = 'Error during processing'
-    requests.get('https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'.format(bot_token, chat_id, error))
+if __name__ == '__main__':
+    
+    
+    result_list = commute( start, end)
+    send_tele( result_list, bot_token = bot_token, chat_id = chat_id)
 
+#@-others
+#@@language python
+#@@tabwidth -4
+#@-leo
