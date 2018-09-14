@@ -1,5 +1,8 @@
+import sys
+
 import commute
 import get_roads
+
 def check_route( road_list, sus_list):
     v_sus_roads = []
     for rd in road_list:
@@ -12,7 +15,7 @@ def res_to_roads( res_list):
 
 if __name__ == '__main__':
 
-    start = '5 katta pl, gooseberry hill, 6076'
+    start = sys.argv[1]
     end = 'curtin university, bentley'
     
     results_list = commute.commute( start, end)
